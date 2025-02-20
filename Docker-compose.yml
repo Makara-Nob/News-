@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"  # MongoDB runs on port 27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}  # Root username
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}  # Root password
+    volumes:
+      - data:/data/db  # Store database data
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    depends_on:
+      - mongodb  # Ensure MongoDB starts first
+    ports:
+      - "8081:8081"  # Mongo-Express runs on port 8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${DB_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${DB_PASSWORD}
+      - ME_CONFIG_MONGODB_SERVER=mongodb  # Connect to the MongoDB service
+      - ME_CONFIG_BASICAUTH_USERNAME=${AUTH_USERNAME}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${AUTH_PASSWORD}
+
+volumes:
+  data: {}
+
+networks:
+  default:
+    name: mongodb_network
